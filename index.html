@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        {{ msg }}
+        <p></p>
+
+        {{ 1 + 1 }}
+        {{ {name: 'zou', age: 20} }}
+        {{ 'name' }}
+        {{ true }}
+        {{ '函数调用' }}
+        {{ 10 }}
+        {{ [1, 2, 3, 4] }}
+        <p></p>
+
+        {{ arr }}
+        {{ obj }}
+        <p></p>
+    </div>
+
+    <button id="btn">点击按钮</button>
+
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                msg: 'name',
+                obj: {
+                    name: 'zou',
+                    age: 20
+                },
+                arr: [1, 2, 3, 4, 5]
+            }
+        });
+        // const vm = new Vue();
+        // vm.$mount = '#app';
+
+        const btn = new Vue({
+            el: '#btn'
+        });
+
+        setTimeout(() => {
+            console.log(btn.$el);
+        }, 0);
+
+        btn.$el.onclick = function () {
+            console.log('hehe')
+        }
+        
+        Vue.nextTick(function () {
+            console.log(this);
+        });
+
+        vm.$nextTick(function () {
+            console.log(this);
+        })
+    </script>
+</body>
+
+</html>
