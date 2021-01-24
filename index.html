@@ -9,16 +9,36 @@
 </head>
 
 <body>
-    <div id="app" @click.middle='handleFunc'>
-        div
+    <div id="app">
+        <ul>
+            <li v-for="(value, index) in personList" style="margin-bottom: 10px;" :key="value.name">
+                {{ value.name }}
+                <input type="text">
+                <button @click="click(index)">下移</button>
+            </li>
+        </ul>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
+            data: {
+                personList: [{
+                        name: 'zou',
+                        age: 20
+                    },
+                    {
+                        name: 'wang',
+                        age: 20
+                    },
+                ]
+            },
             methods: {
-                handleFunc() {
-                    console.log('触发了事件');
+                click(index) {
+                    const deleteValue = this.personList.splice(index, 1); // 删除对应索引位的值，并将其保存
+                    this.personList.splice(index + 1, 0, ...deleteValue); // 将保存起来的值插入到下一个索引位上，利用 展开运算符，得到每一个对象
+                    // console.log(deleteValue);
+                    // console.log(...deleteValue);
                 }
             }
         });
