@@ -4,44 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>仿淘宝筛选</title>
     <script src="./vue.js"></script>
+    <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
     <div id="app">
-        <ul>
-            <li v-for="(value, index) in personList" style="margin-bottom: 10px;" :key="value.name">
-                {{ value.name }}
-                <input type="text">
-                <button @click="click(index)">下移</button>
-            </li>
-        </ul>
+        <div
+         class="goods"
+         v-for="(goods, goodsIndex) in goodsList"
+         :key="goods.id"
+        >
+            <div class="title">{{ goods.title }}：</div>
+            <ul
+             class="type-lisst"
+             v-for="(type, typeId) in goods.typeList"
+            >
+                <li
+                 :class="{active: typeId === goods.index}"
+                 class="type"
+                 :key="type"
+                 @click="handClick(typeId, goods, type, goodsIndex)"
+                >{{ type }}</li>
+            </ul>
+        </div>
+        <div class="choose-type">
+            <div>已选条件:</div>
+            <span
+             class="no-goods"
+             v-if="!showFilterGoods"
+            >暂时没有过滤条件
+            </span>
+            <ul class="filter-list">
+                <li v-for="(goods, goodsKey) in filterObj">{{ goods }}
+                    <span 
+                     @click="deleteGoods(goodsKey)"
+                     class="delete-goods"
+                    >x</span>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
             data: {
-                personList: [{
-                        name: 'zou',
-                        age: 20
+                showFilterGoods: false,
+                filterObj: {},
+                goodsList: [{
+                        title: '上装',
+                        typeList: ['全部', '针织衫', '毛呢外套', 'T恤', '羽绒服', '棉衣', '卫衣', '风衣'],
+                        id: 1,
                     },
                     {
-                        name: 'wang',
-                        age: 20
+                        title: '裤装',
+                        typeList: ['全部', '牛仔裤', '小脚/铅笔裤', '休闲裤', '打底裤', '哈伦裤'],
+                        id: 2,
                     },
+                    {
+                        title: '裙装',
+                        typeList: ['全部', '连衣裙', '半身裙', '长袖连衣裙', '中长款连衣裙'],
+                        id: 3,
+                    }
                 ]
             },
             methods: {
-                click(index) {
-                    const deleteValue = this.personList.splice(index, 1); // 删除对应索引位的值，并将其保存
-                    this.personList.splice(index + 1, 0, ...deleteValue); // 将保存起来的值插入到下一个索引位上，利用 展开运算符，得到每一个对象
-                    // console.log(deleteValue);
-                    // console.log(...deleteValue);
+                handClick(typeId, goods, type, goodsIndex) {
+                    if (type === '全部') return;
+                    goods.index = typeId;
+                    this.showFilterGoods = true;
+
+                    vm.$set(this.filterObj, goodsIndex, type);
+                },
+                deleteGoods(goodsKey) {
+                    vm.$delete(this.filterObj, goodsKey);
+                    this.goodsList[goodsKey].index = 0;
+                    this.changeFilterGoods();
+                },
+                changeFilterGoods() {
+                    const filterStr = JSON.stringify(this.filterObj);
+                    this.showFilterGoods = filterStr !== '{}';
                 }
             }
         });
+        
+        vm.goodsList.forEach(item => vm.$set(item, 'index', 0));
     </script>
 </body>
 
