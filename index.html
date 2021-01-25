@@ -4,44 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仿淘宝筛选</title>
+    <title>todolist练习</title>
     <script src="./vue.js"></script>
     <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
     <div id="app">
-        <div
-         class="goods"
-         v-for="(goods, goodsIndex) in goodsList"
-         :key="goods.id"
-        >
-            <div class="title">{{ goods.title }}：</div>
-            <ul
-             class="type-lisst"
-             v-for="(type, typeId) in goods.typeList"
-            >
-                <li
-                 :class="{active: typeId === goods.index}"
-                 class="type"
-                 :key="type"
-                 @click="handClick(typeId, goods, type, goodsIndex)"
-                >{{ type }}</li>
+        <div class="header">
+            <div class="container">
+                <div class="logo">toDoList</div>
+                <div class="input-area">
+                    <input type="text" @input="wirteList" :value="curMask">
+                    <button @click="addList">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <h2>
+                <span>正在进行</span>
+                <span class="mask-num">{{ needDoList.length }}</span>
+            </h2>
+            <ul class="mask-list">
+                <li v-for="(list, listIndex) in needDoList" :key="list">
+                    <div>
+                        <input type="checkbox" @change="changeList(listIndex, 'needList')">
+                        <span>{{ list }}</span>
+                    </div>
+                    <button @click="deleteList(listIndex, 'needList')">删除</button>
+                </li>
             </ul>
         </div>
-        <div class="choose-type">
-            <div>已选条件:</div>
-            <span
-             class="no-goods"
-             v-if="!showFilterGoods"
-            >暂时没有过滤条件
-            </span>
-            <ul class="filter-list">
-                <li v-for="(goods, goodsKey) in filterObj">{{ goods }}
-                    <span 
-                     @click="deleteGoods(goodsKey)"
-                     class="delete-goods"
-                    >x</span>
+        <div class="container">
+            <h2><span>已经完成</span>
+                <span class="mask-num">{{ completedList.length }}</span>
+            </h2>
+            <ul class="mask-list complete-list">
+                <li v-for="(list, listIndex) in completedList" :key="list">
+                    <div>
+                        <input type="checkbox" @change="changeList(listIndex, 'completedList')">
+                        <span>{{ list }}</span>
+                    </div>
+                    <button @click="deleteList(listIndex, 'completedList')">删除</button>
                 </li>
             </ul>
         </div>
@@ -51,46 +55,37 @@
         const vm = new Vue({
             el: '#app',
             data: {
-                showFilterGoods: false,
-                filterObj: {},
-                goodsList: [{
-                        title: '上装',
-                        typeList: ['全部', '针织衫', '毛呢外套', 'T恤', '羽绒服', '棉衣', '卫衣', '风衣'],
-                        id: 1,
-                    },
-                    {
-                        title: '裤装',
-                        typeList: ['全部', '牛仔裤', '小脚/铅笔裤', '休闲裤', '打底裤', '哈伦裤'],
-                        id: 2,
-                    },
-                    {
-                        title: '裙装',
-                        typeList: ['全部', '连衣裙', '半身裙', '长袖连衣裙', '中长款连衣裙'],
-                        id: 3,
-                    }
-                ]
+                curMask: '',
+                needDoList: ['吃饭', '睡觉'],
+                completedList: ['打豆豆']
             },
             methods: {
-                handClick(typeId, goods, type, goodsIndex) {
-                    if (type === '全部') return;
-                    goods.index = typeId;
-                    this.showFilterGoods = true;
-
-                    vm.$set(this.filterObj, goodsIndex, type);
+                wirteList(e) {
+                    this.curMask = e.target.value;
                 },
-                deleteGoods(goodsKey) {
-                    vm.$delete(this.filterObj, goodsKey);
-                    this.goodsList[goodsKey].index = 0;
-                    this.changeFilterGoods();
+                addList() {
+                    if (this.curMask === '') return;
+                    this.needDoList.push(this.curMask);
+                    this.curMask = '';
                 },
-                changeFilterGoods() {
-                    const filterStr = JSON.stringify(this.filterObj);
-                    this.showFilterGoods = filterStr !== '{}';
+                changeList(listIndex, need) {
+                    if (need === 'needList') {
+                        const completedList = this.needDoList.splice(listIndex, 1);
+                        this.completedList.push(...completedList);
+                    } else {
+                        const needList = this.completedList.splice(listIndex, 1);
+                        this.needDoList.push(...needList);
+                    }
+                },
+                deleteList(listIndex, need) {
+                    if (need === 'needList') {
+                        this.needDoList.splice(listIndex, 1);
+                    } else {
+                        this.completedList.splice(listIndex, 1);
+                    }
                 }
             }
         });
-        
-        vm.goodsList.forEach(item => vm.$set(item, 'index', 0));
     </script>
 </body>
 
