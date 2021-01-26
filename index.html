@@ -4,85 +4,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>侦听器</title>
+    <title>百度搜索联想</title>
     <script src="./vue.js"></script>
+    <script src="./jquery.js"></script>
+    <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
     <div id="app">
-        {{ msg }}
+        <div class="logo">
+            <img src="https://www.baidu.com/img/bd_logo1.png?where=super" title="点击一下，了解更多">
+        </div>
+        <div class="search-box">
+            <span class="search-area">
+                <input type="text" maxlength="100" v-model="inputVal" @focus="isShow = true" @blur="isShow = false">
+                <span class="icon icon-paizhao"></span>
+            </span>
+            <span class="search-btn">百度一下</span>
+        </div>
+        <ul class="search-list" v-show="isShow && searchResList.length">
+            <li v-for="search in searchResList">
+                {{ search }}
+            </li>
+        </ul>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
             data: {
-                a: 1,
-                b: 2,
-                msg: 'div',
-                obj: {
-                    name: 'zou',
-                    age: 20
-                }
+                inputVal: '',
+                searchResList: [],
+                isShow: false
             },
             methods: {
-                print() {
-                    console.log('hehe');
+                searchRes(res) {
+                    this.searchResList = res.s;
                 }
             },
             watch: {
-                // msg() {
-                //     console.log('hehe');
-                // },
-                // msg: {
-                //     handler() {
-                //         console.log('hehe');
-                //     }
-                // }
-                // obj: {
-                //     handler() {
-                //         console.log('hehe');
-                //     },
-                //     deep: true,
-                //     immediate: true
-                // }
-                // msg: 'print'
-                // msg(newVal, oldVal) {
-                //     console.log(newVal, oldVal);
-                // }
+                inputVal(val) {
+                    if (!val) return;
+                    $.ajax({
+                        dataType: 'jsonp',
+                        url: 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su',
+                        data: {
+                            wd: this.inputVal,
+                            cb: 'vm.searchRes'
+                        }
+                    })
+                }
             }
-        });
-
-        // vm.$watch('obj', () => {
-        //     console.log('hehe');
-        // }, {
-        //     deep: true
-        // })
-
-        // vm.$watch('obj', {
-        //     handler() {
-        //         console.log('hehe');
-        //     },
-        //     deep: true
-        // });
-
-        // const unwatch = vm.$watch('msg', {
-        //     handler() {
-        //         unwatch();
-        //         return;
-        //         console.log('hehe');
-        //     }
-        // });
-
-        var unwatch = vm.$watch('obj', function() {
-            if (unwatch) {
-                unwatch();
-                return;
-            }
-            console.log('hehe');
-        },{
-            deep: true,
-            immediate: true
         });
     </script>
 </body>
