@@ -366,3 +366,120 @@ vm.$http.post('请求地址', {
 3）blob()：以 二进制 Blob 对象方式 返回响应体
 
 *不过 vue 官方已经停止维护这个库，推荐使用其他库（axios.js）*
+
+## axios
+
+> 是一个基于 promise 的 http 库，支持跨平台，Chrome、Firefox、Edge、IE8+、Opear、Safari
+
+最常用的配置：
+
+```yaml
+axios({
+    method: '请求方式',
+    baseURL: '请求的域名，基本地址',
+    url: '请求的路径',
+    params: {
+        会将请求的参数拼接在url中，一般用于get请求时需要传递
+    },
+    data: {会将请求参数放在请求体中},
+    headers: {设置请求头，例如设置 token 等},
+    timeout: {设置请求时长，单位：ms}
+})
+```
+
+为了方便期间，axios提供了别名，使用方式和 vue-resource 一样
+
+> axios 提供了 三种配置方式：
+
+1）全局配置：axios.default.配置信息 = '参数'
+
+2）实例设置：const instance = new axios.create()，可以通过 instance.配置信息 = '参数'
+
+3）自身配置
+
+*优先级顺序：自身配置 > 实例配置 > 全局配置*
+
+### 并发
+
+> axios 提供了一个类似于 promise 中的 all，可以同时进行多个请求，并发（统一）处理返回结果，还一个 spread 回调函数，接收的参数就是 依次传递的 请求的返回结果
+
+```yaml
+axios.all([
+    axios.get('');
+    axios.post('');
+]).then(axios.spread(aRes, bRes) => {
+    // 进行处理
+});
+```
+
+### 拦截器 interceptors
+
+1）请求拦截器（use）
+
+> 在发送请求时，或在相应后做一些处理
+
+```js
+axios.interceptors.request.use(config => {
+    // 发送请求时做些什么
+    return config;
+})
+或
+axios.interceptors.response.use(response => {
+    // 对相应结果做些什么
+    return response;
+})
+```
+
+2）移除拦截器（eject）
+
+```js
+const myInterceptor = axios.interceptors.request.use(config => {return config});
+axios.interceptors.request.eject(myInterceptor);
+或
+axios.interceptors.response.eject(myInterceptor);
+```
+
+3）为 axios 实例添加拦截器
+
+```js
+const instance = axios.create();
+instance.interceptors.request.use(cofig => {return config});
+或
+instance.interceptors.response.use(response => {return response});
+```
+
+### 取消请求
+
+> 用于取消正在进行的 http 请求
+
+```js
+const source = axios.CancelToken.source();
+
+axios.get(url, {
+    cancelToken: source
+}).then(res => {
+    console.log(res);
+}).catch(error => {
+    if(axios.isCancel) {
+        // 取消请求
+        console.log(error.message);
+    } else {
+        // 处理错误
+    }
+})
+
+// 取消请求，参数可选
+source.cancel('message');
+```
+
+### 错误处理
+
+*request 和 response 是 error 的上下文，标志着 请求发送 / 得到响应时 发生错误*
+
+*如果 response 有值，则说明是：响应时发生错误；如果 response 没值，则说明是：请求时发生错误；如果两个都没值，则说明是：请求未发出，如：取消请求*
+
+> 在实际开发中，一般拦截器中统一添加错误处理 请求拦截器中的错误，当请求处理未成功时执行，但注意的是：取消请求后，请求拦截器中的错误函数也不会执行，因为取消请求不会抛出异常，axios 对其进行了单独的处理。在更多情况下，我们会在响应拦截器中处理错误
+
+### axios预检
+
+> 当 axios 的请求为非简单请求时，浏览器会进行预检，以及发送 options 请求。请求到服务器，询问是否支持跨域。如果响应体中允许预检中请求的跨域，则浏览器会进行真正的请求，否则会抛出 405 错误
