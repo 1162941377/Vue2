@@ -391,7 +391,7 @@ axios({
 
 > axios 提供了 三种配置方式：
 
-1）全局配置：axios.default.配置信息 = '参数'
+1）全局配置：axios.defaults.配置信息 = '参数'
 
 2）实例设置：const instance = new axios.create()，可以通过 instance.配置信息 = '参数'
 
