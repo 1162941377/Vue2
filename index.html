@@ -34,37 +34,38 @@
         </div>
 
         <!-- 导航栏 -->
-        <div 
-         v-if="navList.length"
-         :class="{
-             'nav-box': nav === 1,
-             'hide-nav-box': nav === 2,
-             'navShow': nav === 2 && navShow
-         }" 
-         v-for="nav in 2">
-            <ul class="nav-list">
-                <li
-                 @click="changeSelected(index)"
-                 :class="{active: navActiveIndex === index}"
-                 class="nav"
-                 v-for="(nav, index) in navList"
-                 :key="nav.id"
-                >{{ nav.title }}
-                </li>
-            </ul>
+        <template>
             <div 
-             v-if="nav === 1"
-             class="down"
-             @click="changeList('down')">
-                <svg height="16" width="32" viewBox="0 0 1024 1024"><path d="M515.2 649.6L169.6 304c-12.8-12.8-32-12.8-44.8 0s-12.8 35.2 0 48l368 364.8c12.8 12.8 32 12.8 44.8 0l361.6-361.6c12.8-12.8 12.8-35.2 0-48s-32-12.8-44.8 0L515.2 649.6z" fill="#ccc"></path></svg>
+            :class="{
+                'nav-box': nav === 1,
+                'hide-nav-box': nav === 2,
+                'navShow': nav === 2 && navShow
+            }" 
+            v-for="nav in 2">
+                <ul class="nav-list">
+                    <li
+                    @click="changeSelected(index)"
+                    :class="{active: navActiveIndex === index}"
+                    class="nav"
+                    v-for="(nav, index) in navList"
+                    :key="nav.id"
+                    >{{ nav.title }}
+                    </li>
+                </ul>
+                <div 
+                v-if="nav === 1"
+                class="down"
+                @click="changeList('down')">
+                    <svg height="16" width="32" viewBox="0 0 1024 1024"><path d="M515.2 649.6L169.6 304c-12.8-12.8-32-12.8-44.8 0s-12.8 35.2 0 48l368 364.8c12.8 12.8 32 12.8 44.8 0l361.6-361.6c12.8-12.8 12.8-35.2 0-48s-32-12.8-44.8 0L515.2 649.6z" fill="#ccc"></path></svg>
+                </div>
+                <div 
+                v-else
+                class="up" 
+                @click="changeList('up')">
+                    <svg height="16" width="32" viewBox="0 0 1024 1024"><path d="M854.4 713.6c12.8 12.8 32 12.8 44.8 0s12.8-35.2 0-48L537.6 304c-12.8-12.8-32-12.8-44.8 0L124.8 672c-12.8 12.8-12.8 35.2 0 48s32 12.8 44.8 0l345.6-342.4 339.2 336z" fill="#ccc"></path></svg>
+                </div>
             </div>
-            <div 
-             v-else
-             class="up" 
-             @click="changeList('up')">
-                <svg height="16" width="32" viewBox="0 0 1024 1024"><path d="M854.4 713.6c12.8 12.8 32 12.8 44.8 0s12.8-35.2 0-48L537.6 304c-12.8-12.8-32-12.8-44.8 0L124.8 672c-12.8 12.8-12.8 35.2 0 48s32 12.8 44.8 0l345.6-342.4 339.2 336z" fill="#ccc"></path></svg>
-            </div>
-        </div>
+        </template>
 
         <!-- 轮播图 -->
         <div 
