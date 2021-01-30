@@ -509,3 +509,400 @@ vue 会根据 template 中的模板渲染页面
 7）beforeDestroy：通过 vm.$destroy()，可以销毁 vue 实例化对象，此钩子函数会在销毁前执行，一般用于清除定时器
 
 8）destroyed：vue 实例化对象完全销毁，调用 vm.$destroy()后，也不会执行该钩子函数，因为 vue 实例化对象已经被销毁
+
+## 组件
+
+> 是一个可复用的 vue 实例，自定义标签，一个 template 模板中只能存在一个标签，如果想要定义多个，使用一个父级 div 包裹
+
+> 在组件中可以使用跟 vm 实例中一样的配置，不过 data 中的数据是定义在一个函数中，通过 键值对 定义，键名对应的是属性，键值对应的是值，通过 return 返回结果；组件中没有 el，这是 vm 中独有的选项
+
+1）全局组件：通过 Vue.componenet('组件名', { 配置信息 });
+
+2）局部组件：通过 定义一个对象，配置信息，然后在 vm 实例中添加一个属性，components，是一个对象，通过 键值对 的形式定义
+
+*组件名：小写字母 - 小写字母，建议使用这种方式定义，有利于阅读和维护；也可以通过大驼峰式命名，使用时也可以直接用名字或小写字母 - 小写字母；W3C组织推荐使用第一种方式，自定义标签名，编辑器中也有提示，更利于书写*
+
+### 组件复用
+
+> 可以将定义好的组件进行任意次数的复用
+
+### 自闭合组件
+
+> 在以前版本的浏览器中，是不支持除了官方定义的自闭合标签外的显示，如果要使用的话，要在 template 中书写，但是现在的浏览器能直接识别
+
+### Prop
+
+*由于html的特性，对大小写不敏感，所以浏览器会将大写解释为小写字符，当传递的 prop 为短横线分割的形式时，组件内接收和使用时需要用小驼峰式命名；如果使用的是模板字符串的话，这个限制不存在*
+
+    > 组件默认只是写好结构、样式和行为，数据应由外界传递
+
+> 父传子，子身上有一个 props 属性，可以使一个数组，用于表示接收 父 的对应的数据
+
+### 传递静或动态 Prop
+
+> 通过 v-bind 绑定
+
+### 传递一个或全部属性
+
+> 通过 v-bind="对象"
+
+```html
+<my-cmp>
+    :name="person.name"
+    :age="person.age"
+</my-cmp>
+```
+
+也可以简写成
+
+```html
+<my-cmp v-bind="person"></my-cmp>
+```
+
+### Prop 验证
+
+> vue 提供了如下配置，用于验证传递的数据的格式，为了团队更好地合作，prop的定义应该尽可能地详细，至少指定传递数据的类型
+
+*Function、String、Symbol、Number、Boolean、Object、Array、Data、Promise；两个特殊的情况，如果传递的值是：undefined 或 null，会通过所有的验证*
+
+> 只是验证，会在控制台报错，数据还是会传递
+
+```js
+Vue.component('my-cmp', {
+    props: {
+        tilte: String,
+        likes: Number,
+        isPublished: Boolean,
+        commentIds: Array,
+        author: Object,
+        callback: Function,
+        contactsPromise: Promise
+    }
+});
+```
+
+> 除了以上的基础配置，我们还指定更多
+
+```js
+Vue.component('my-cmp', {
+    props: {
+        tilte: {
+            type: String, // 类型
+            default: '内容', // 默认值
+            required: true, // 是否为必填项
+            validator(prop) { // 自定义函数，该 prop 值作为唯一的参数传入，若函数返回一个 falsy 值，那么就代表失败
+                return 处理逻辑; // 注意是：falsy，表示：假值
+            }
+        }
+    }
+});
+```
+
+### 单向数据绑定
+
+> 所有的 prop 都使得其父子的 prop 之间形成了一个 单向下行绑定：父级的 prop 的更新会影响到 子的 prop；反过来则不行
+
+1）正是因为这个特点，无论子的 prop 如何改变，一旦改变父的 prop ，子的 prop 会同步
+
+2）如果传递的是 数组 或 对象，由于是引用值，所以子的改变也会影响父的改变
+
+针对上述情况，我们可以使用以下两种情况处理：
+
+1）在子的 data 中，返回一个属性，属性值就是传递进来的 prop，保存在自身，与父的 prop 脱落关系
+
+2）如果传递进来的 prop 作为原始数据，那么可以在子身上添加一个计算属性 computed，return 一个处理过的数据
+
+### 非 Prop 特性
+
+> 指的是：当传递一个未被组件注册过（props 数组中没有）的特性时，该特性会被添加到这个组件的根元素上
+
+如果在 template 模板中，定义了一个非 prop 特性，如果在标签行间也添加了同名的非 prop 特性，那么会使用行间的那个 prop 特性；如果设置的是 class 或 style，那么会进行合并，而不是像之前样进行覆盖
+
+*$attrs：保存着定义好的 prop 特性，如果不想要子直接继承，而是希望其他标签能继承，使用 inheritAttrs：false，其次在想要继承的标签上，配合使用 v-bind="$attrs"*
+
+> inheritAttrs 的设置不会影响到 class 或 style 的绑定
+
+*$emit('自定义方法', 抛出的值)，在子中使用，父中可以使用这个自定义好的方法 通过 $event 可以获取到传递的第二个参数的值*
+
+### 事件名
+
+*不同于 组件 和 prop，事件名不存在任何的大小写自动转换，推荐使用 kebab-case（短横线命名原则）*
+
+### 将原生事件绑定到组件
+
+> 通过修饰符 v-on的指令：.native
+
+> 但是如果将要监听的标签进行了嵌套，那么即使设置了，也不能生效，这个时候，可以使用子身上的 $listeners，得到父的设置好的所有监听函数，通过子的 v-on="$listeners"，让父可以监听原生事件
+
+### sync 修饰符
+
+> 和 v-model 类似的功能，都能实现数据的双向绑定，不同的是：
+
+1）.sync 用于父组件身上，在子内通过 @事件处理名="$emit('update:传递进来的值', $event.target.value)" 传递值给父
+
+```html
+<base-input
+ :value="value"
+ @update:value="value = $event"
+></base-input>
+```
+
+也可以简写成
+
+```html
+<base-input
+ :value.sync="value"
+></base-input>
+```
+
+### v-model VS .sync
+
+*先明确一件事情，在 vue 1.x 时，就已经支持 .sync 语法，但是此时的 .sync 可以完全在子组件中修改父组件的状态，造成整个状态的变换很难追溯，所以官方在 2.0 时移除了这个特性。然后在 vue2.3 时 .sync 又回归了，跟以往不同的是，现在的 .sync 完完全全就是一个语法糖的作用，跟 v-model 的实现原理是一样的，也不容易破环院有的数据模型，所以使用上更安全也更方便。*
+
+1）带有.sync 修饰符的 v-bind 指令，只能提供想要绑定的属性名，不能和表达式一起使用，如：:title.sync="1+1"，这样操作是无效的
+
+2）将 v-bind.sync 用在 一个字面量对象上，如 v-bind.sync="{ title: 'haha' }"，是无法工作的，因为在解析一个像这样的复杂表达式的时候，有很多边缘情况需要考虑。
+
+3）两者都是用于实现 双向数据传递（双向链路） 的，实现方式都是 语法糖，最终通过 prop + 事件 来达成目的。
+
+4）vue 1.x 的 .sync 和 v-model 是完全两个东西，vue 2.3 之后可以理解为一类特性，使用场景略微有区别
+
+5）当一个组件对外只暴露一个受控的状态，切都符合统一标准的时候，我们会使用 v-model 来处理。.sync 则更为灵活，凡是需要双向数据传递时，都可以去使用。
+
+### 插槽
+
+> 在组件中插入内容（组件），通过在 template 中使用 <slot></slot> 标签，相当于是一个占位符，vue 会将组件或内容插入到对应的位置上
+
+### 编译作用域
+
+*父级模板中的所有内容都是在父级作用域中编译的；子级模板中的内容都是在子级作用域中编译的*
+
+### 后备内容
+
+> 也就是：默认插槽，如果 <slot>默认插槽中的内容</slot> 中没有内容，那么会显示 标签中的内容
+
+### 具名插槽
+
+> 在组件的 template 的结构中定义：<slot name='名字'></slot>
+
+> 在 父 中添加 <template v-slot:名字></template>；如果要使用的是默认插槽，<template v-slot:default="名字"></template>，也可以省略不写，默认就是默认插槽，此时可以简写为：<template slot="default"></template>
+
+> 但是为了更好的 html 结构和代码的维护性，建议都加上
+
+### 作用域插槽
+
+> 为了能让插槽内容访问子组件的数据，我们可以使用：<slot :prop="data 中的属性"></slot>
+
+> 父级作用域中使用时，通过 <template v-slot:default="prop">{{ prop.xxx }</template>
+
+### 独占默认插槽
+
+> 如果被提供的内容只有默认插槽时，组件的标签可以当做插槽的 模板 来使用，也就是可以省略 原本需要包裹的 <template></template> 标签，此时可以通过：<my-cmp v-slot:default="prop">{{ prop.xxx }}</my-cmp>
+
+*<slot name="名字"></slot> 在子的模板中定义，在父中配合使用 <template v-slot:名字></template>，除了上面一种特殊情况外*
+
+*默认插槽的缩写语法不能和具名插槽混用，因为它会导致作用域不明确*
+
+### 解构
+
+> 我们可以使用类似于 es6 的解构语法，使用：<template v-slot="{ 解构 }"></template>；也提供了重命名，<template v-slot="{ 解构: 重命名的名字 }"></template>
+
+```html 默认值，如果 sex 值为 undefined，那么 user.sex="male"；如果有值，正常输出 user.sex
+<template v-slot="{ user = { sex: 'male' } }">{{ user.sex }}</template>
+```
+
+有如下特殊情况
+
+```html 如果 sex 值为 undefined，那么只会输出默认值；如果有值，正常输出对象
+<template v-slot="{ user = { sex: 'male' } }">{{ user }}</template>
+```
+
+### 动态插槽
+
+> 使用的是：<template v-slot:[prop]></template>
+
+### 具名插槽的缩写
+
+> v-bind 可以缩写为 :
+
+> v-on 可以缩写为 @
+
+> v-slot 可以缩写为 #
+
+*当有参数传递时，才可以进行缩写*
+
+### 废弃语法
+
+```html
+<my-cmp>
+  <template slot="header">
+    <h1>头部</h1>
+  </template>
+
+  <template>
+    <p>内容</p>
+    <p>内容</p>
+  </template>
+
+  <template slot="footer">
+    <p>底部</p>
+  </template>
+</my-cmp>
+```
+
+```html
+<my-cmp>
+  <template slot="default" slot-scope="slotProps">
+    {{ slotProps.user.name }}
+  </template>
+</my-cmp>
+```
+
+### 动态组件
+
+> 定义好组件，然后在父中 通过 <component :is="组件名"></component>，实现切换效果
+
+> vue 提供了一个 标签，用于缓存切换的标签，而不是销毁，在 <component :is="组件名"><component> 外包裹一个 <keep-alive></keep-alive> 标签，有两个钩子函数
+
+1）activated：keep-alive 组件激活时 触发
+
+2）deactivated：keep-alive 组件停用时 触发
+
+### 处理边界情况
+
+*一些需要对 vue 的规则做一些小调整的特殊情况，需要注意的是：这些功能都是有一定的劣势或危险性的，慎用*
+
+1）$root：在每个子组件中，访问根实例
+
+2）$parent：在每个子组件中，访问父实例
+
+3）依赖注入：通过 provide() { return key: value } 和 inject: ['key']
+
+> 注意的是：被注入的属性是放到身上的实例对象上的，如果想要使用，通过 this.xxx 访问数据
+
+- 存在两种特殊情况，不能使用：
+
+> 祖先组件不知道哪些后代组件需要使用它的属性
+
+> 后代组件不需要知道被注入的属性来自哪
+
+4）$ref：在js代码中，给子组件身上添加一个唯一标识，ref="名"，在 vm 实例中，可以通过 this.$refs 访问到；如果 ref 和 v-for 指令一起使用，那么通过 this.$refs 得到的数据是一个数组
+
+### 程度化的事件监听器
+
+1）通过 $on(eventName, eventHandler)：侦听一个事件
+
+2）通过 $once(eventName, eventHandler)：侦听一次事件
+
+3）通过 $off(eventName, eventHandler)：停止侦听一个事件
+
+> 一般不会使用到，除了当需要在一个组件上手动侦听事件时，可以派上用场
+
+*eventName：'hook:vue的某个生命周期'*
+
+*eventHandler：function() { 处理的函数 }*
+
+```js
+Vue.component('my-cmp', {
+    mounted() {
+        // 这是一个第三方库，提供关于时间插件，叫 Pikaday
+        this.picker = new Pikaday({
+            field: this.$refs.input,
+            format: 'YYYY-MM-DD'
+        });
+    },
+    beforeDestroy() {
+        // 组件被销毁时前，也销毁这个日期选择器
+        this.picker.destroyed();
+    }
+});
+```
+
+> 我们想销毁这个插件，但是给 vm 身上添加了一个 全局属性，为了不污染，建议使用如下方式：
+
+```js
+Vue.component('my-cmp', {
+    mounted() {
+        var picker = new Pikaday({
+            field: this.$refs.input,
+            format: 'YYYY-MM-DD'
+        });
+
+        this.$once('hook:beforeDestroy', () => {
+            picker.destroyed();
+        })
+    }
+});
+```
+
+### 循环调用
+
+> 组件可以通过自身调用，只能通过 name 选项；如果是通过全局的 Vue.component('组件名', { xxx })，注册的话，全局的 ID 会自动设置该组件的 name 选项
+
+*和 递归调用 一样，需要个 出口，不然会造成 栈溢出，浏览器会报错：Maximum call stack size exceeded*
+
+### 组件间的循环调用
+
+> 如果使用的是全局组件，并不会出现悖论，但是如果使用的是局部组件，就会出现悖论
+
+*即使是使用了全局组件，在使用 webpack 去导入组件时，也会出现一个错误：Failed to mount component:template or render function not defined*
+
+> 因为 webpack 会对模块进行分析，编译处理的时候，发现依赖关系，但是是一个循环，所以会抛出错误，此时，我们需要给模块一个点，告诉模块依赖关系，但是先不解析另一个模块
+
+```js
+beforeCreated() {
+    this.$options.components.CmpB = require('./tree-folder-contents.vue').default;
+}
+```
+
+*或本地注册组件时，可以使用 webpack 的异步导入 import*
+
+```js 
+components: {
+    CmpB () {
+        import('./tree-folder-contents.vue');
+    }
+}
+```
+
+### 内联模板
+
+> 在组件时使用特性，inline-template，不推荐，最佳实践是：在组件内使用 template 选项 或 .vue 文件中的 <template></template> 标签来定义模板
+
+### X-Template
+
+> 另一个定义的模板是在一个 <script></script> 中，并为其带上一个 text/x-template 的类型，然后通过一个 id 将模板引用过去
+
+### 控制更新
+
+> 当更改了数据，页面却并未重新渲染，我们可以使用 $foreUpdate 做一次强制刷新，但很少情况下会用，排查一切后，还是没有渲染，再使用
+
+> 在模板中的标签上使用 v-once 创建低开销的静态组件，还是不建议使用
+
+## 通信
+
+1）prop：父组件传递数据，子组件通过 props 接收
+
+2）$emit：子组件触发事件，抛出数据，传递给父组件
+
+3）v-model、.sync：双向数据绑定（双向链路）
+
+> v-model 可以直接绑定 type 为 text 的 input 中的 value 值，如果是其他，记得配置 model 选项；使用 .sync 时，在子组件上设置 :prop 和 @prop="$emit('update:prop', $event.target.[value | checked])"，在父组件上才可以使用 :prop.sync
+
+4）$attrs：祖先组件传递数据给子孙组件，可以利用 $attrs，真正的目的是：撰写组件，将非 prop 特性赋予某些 dom 元素
+
+> 配合 inheritAttrs: false，使用
+
+5）$listeners：可以在子组件上执行祖先组件的函数，从而实现数据传递，真正的目的是：将所有的事件监听器指向这个组件的某个特定的子元素
+
+6）$root：可以在子组件访根实例（vm）的数据
+
+7）$children：可以在父组件中访问子实例的数据
+
+8）$ref：可以在父组件上访问子实例的数据
+
+8）provide、inject；祖先组件提供数据（provide），子孙组件获取数据（inject）
+
+9）eventBus（事件总线）：可以在兄弟组件间传递数据，通过 Vue.prototype.$bus 自定义属性
+
+10）Vuex：状态管理，中大型项目强烈推荐使用
