@@ -11,180 +11,63 @@
 <body>
 
     <div id="app">
-        <input 
+        <input
          type="text"
-         v-demo="{
-             color: '#008c8c',
-             text: 'textContent'
-         }"
+         :value="number | addWord"
         />
     </div>
 
     <script>
-        Vue.directive('demo', {
-            bind(el, binding) {
-                console.log(el, binding.value);
-            }
+        Vue.filter('addWord', value => {
+            if (!value) { return; }
+            const result = value > 10000 ? (value / 10000).toFixed(1) + '万' : value;
+            return result;
         });
 
+        // 将数字转为为 ‘万’ 表示法，并只保留一位小数
         const vm = new Vue({
-            el: '#app'
+            el: '#app',
+            data: {
+                number: 5201314
+            }
         });
     </script>
 
 
 
     <!-- <div id="app">
-        <input type="text" v-slice:[slicenum].number="content" />
-    </div>
-
-    <script>
-        /**
-         * 自定义指令：v-slice
-         * 可以接收一个参数和一个修饰符
-         * 如果不传参数，默认截取到三位
-         * 如果传了修饰符，只能输入和保留数字  
-        **/
-        Vue.directive('slice', (el, binding, VNode) => {
-            const vm = VNode.context;
-            let { value, expression, arg, modifiers } = binding;
-            arg = arg || 3;
-
-            for (const prop in modifiers) {
-                if (prop === 'number') {
-                    value = value.replace(/[^\d]+/g, '');
-                }
-            }
-
-            el.value = value.slice(0, arg);
-
-            el.oninput = function() {
-                for (const prop in modifiers) {
-                    if (prop === 'number') {
-                        el.value = el.value.replace(/[^\d]+/g, '');
-                    }
-                }
-
-                this.value = this.value.slice(0, arg);
-                vm[expression] = el.value.slice(0, arg);
-            }
-        });
-
-        const vm = new Vue({
-            el: '#app',
-            data: {
-                content: 'textContent',
-                slicenum: 5
-            }   
-        });
-    </script> -->
-
-
-    <!-- <div id="app">
-        <input 
+        <input
          type="text"
-         v-mymodel="value"
+         :value="number | toMoney"
         />
     </div>
 
     <script>
-        /**
-         * v-model：需要绑定一个参数，值为 string 类型
-         * 1. 通过绑定的数据，给元素设置 value
-         * 2. 当触发 input 事件时，更改绑定的数据值
-         * 3. 更改数据后，同步 input 的 value 值
-        **/
-        Vue.directive('mymodel', {
-            bind(el, binding, VNode) {
-                const { value } = binding;
-                el.value = value;
-
-                el.oninput = function () {
-                    VNode.context.value = el.value;
-                }
-            },
-            update(el, binding) {
-                const { value } = binding;
-                el.value = value;
-            }
+        // 将数字转换为 money 表示法
+        Vue.filter('toMoney', value => {
+            if (!value) { return; }
+            return value.toLocaleString();
         });
 
-        // 模拟 v-show 指令
         const vm = new Vue({
             el: '#app',
             data: {
-                value: 'value'
+                number: 5201314
             }
         });
     </script> -->
 
 
     <!-- <div id="app">
-        <input 
-         type="text"
-         v-show="isShow"
-        />
+        <input type="text" :value="value | capitalize"/>
     </div>
 
     <script>
-        /**
-         * v-show：需要绑定一个参数，值为 boolean
-         * 如果是 true，display 值 为 block；
-         * 如果是 false，display 值 为 none
-        **/
-        Vue.directive('show', {
-            bind(el, binding) {
-                const { value } = binding;
-                const display = value ? '' : 'none';
-                el.style.display = display;
-            },
-            update(el, binding) {
-                const { value } = binding;
-                const display = value ? '' : 'none';
-                el.style.display = display;
-            }
-        });
-
-        // 模拟 v-show 指令
-        const vm = new Vue({
-            el: '#app',
-            data: {
-                isShow: true
-            }
-        });
-    </script> -->
-
-
-
-    <!-- <div id="app">
-        <input 
-         type="text"
-         v-focus
-         :value="value"
-        />
-    </div>
-    
-    <script>
-        // 当进入页面时，自动聚焦 input 框
-        Vue.directive('focus', {
-            bind(el, binging, VNode) {
-                console.log(el, binging, VNode.context);
-                console.log('bind');
-            },
-            inserted(el) {
-                el.focus();
-                console.log('inserted')
-            },
-            update() {
-                console.log('update');
-            },
-            componentUpdated() {
-                console.log('componentUpdated');
-            },
-            unbind() {
-                console.log('unbind');
-            }
-        });
+        // 首字母大写
+        Vue.filter('capitalize', value => {
+            if (!value) { return; }
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        })
 
         const vm = new Vue({
             el: '#app',
