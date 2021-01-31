@@ -916,3 +916,42 @@ components: {
 2）全局混入：通过 Vue.mixin({ xxx })，通过 new 关键词 的 vue 实例中可以直接使用
 
 *混入的注意项：如果是基础值，会进行覆盖；如果是对象或数组，会进行合并；如果是钩子函数，会依次进行输出*
+
+## 自定义指令
+
+*和 vue 自带的指令一样，我们自定义的指令，也需要在全面加上 v- 的前缀*
+
+1）全局自定义：Vue.directive('名字', { xxx })
+
+2）局部指令：通过 new 出来的 vue 实例上，配置 directives 选项，是一个对象，键值对形式 {'名字', { xxx }}
+
+> 类似于 vue 的生命周期，vue 有 八个 钩子函数，自定义指令 vue 也提供了 五个钩子函数
+
+1）bind：只调用一次，一旦绑定，立即执行，可以在这里进行初始化设置
+
+2）inserted：被绑定的元素插入到父节点时调用（仅保证父节点存在，但不一定已被插入到文档中）
+
+3）update：所在组件的 VNode 更新时被调用，但是可能发生在其子 VNode 更新之前
+
+4）componentUpdated：指令所在组件的 VNode 及其子 VNode 全部更新后被调用
+
+5）unbind：只调用一次，指令与元素解绑时被调用（被绑定的 dom 元素被 vue 移除）
+
+### 钩子函数参数
+
+1）el：指令所绑定的元素，可以直接操作 dom
+
+2）binging：{
+    name：指令名，不包括 v- 前缀
+    value：指令的绑定值
+    oldValue：指令绑定的前一个值，仅在 updated 和 componentUpdated 钩子函数中可用，无论值是否发生变化都可用
+    expression：字符串形式的指令表达式
+    arg：传给指令的参数，可选
+    modifier：一个包含修饰符的对象
+}
+
+3）VNode：vue 生成的 虚拟 dom 节点
+
+4）oldVNode：上一个 虚拟 dom 节点，仅在 updated 和 componentUp 钩子函数中可用
+
+*如果钩子函数只有 bind 和 update， 那么可以进行简写，直接写成一个处理函数，里面是处理逻辑*

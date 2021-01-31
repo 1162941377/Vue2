@@ -9,77 +9,166 @@
 </head>
 
 <body>
+
     <div id="app">
-        <my-cmp></my-cmp>
+        <input type="text" v-slice:[slicenum].number="content" />
     </div>
 
     <script>
-        // 基础混入
-        var mixin = {
-            created() {
-                this.hello();
-            },
-            methods: {
-                hello() {
-                    console.log('hello，我是混入中的函数');
-                },
+        /**
+         * 自定义指令：v-slice
+         * 可以接收一个参数和一个修饰符
+         * 如果不传参数，默认截取到三位
+         * 如果传了修饰符，只能输入和保留数字  
+        **/
+        Vue.directive('slice', (el, binding, VNode) => {
+            const vm = VNode.context;
+            let { value, expression, arg, modifiers } = binding;
+            arg = arg || 3;
+
+            for (const prop in modifiers) {
+                if (prop === 'number') {
+                    value = value.replace(/[^\d]+/g, '');
+                }
             }
-        }
 
-        Vue.component('my-cmp', {
-            mixins: [mixin],
-            template: `
-                <div>xx</div>
-            `
-        })
+            el.value = value.slice(0, arg);
 
-        const vm = new Vue({
-            el: '#app'
+            el.oninput = function() {
+                for (const prop in modifiers) {
+                    if (prop === 'number') {
+                        el.value = el.value.replace(/[^\d]+/g, '');
+                    }
+                }
+
+                this.value = this.value.slice(0, arg);
+                vm[expression] = el.value.slice(0, arg);
+            }
         });
 
-        // // 为自定义的选项 'myOption'：如果值存在，则输出
-        // Vue.mixin({
-        //     created() {
-        //         const option = this.$options.myOption;
-        //         if (option) {
-        //             console.log(option);
-        //         }
-        //     }
-        // })
-
-        // new Vue({
-        //     myOption: 'hello!'
-        // })
-
-        // var mixin = {
-        //     created() {
-        //         console.log('混入对象钩子')
-        //     }
-        // }
-
-        // new Vue({
-        //     el: '#app',
-        //     mixins: [mixin],
-        //     created() {
-        //         console.log('组件钩子')
-        //     }
-        // })
-
-        // var mixin = {
-        //     data() {
-        //         return {
-        //             msg: 'hello',
-        //         }
-        //     }
-        // }
-
-        // new Vue({
-        //     mixins: [mixin],
-        //     created: function () {
-        //         console.log(this.msg)
-        //     }
-        // })
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                content: 'textContent',
+                slicenum: 5
+            }   
+        });
     </script>
+
+
+    <!-- <div id="app">
+        <input 
+         type="text"
+         v-mymodel="value"
+        />
+    </div>
+
+    <script>
+        /**
+         * v-model：需要绑定一个参数，值为 string 类型
+         * 1. 通过绑定的数据，给元素设置 value
+         * 2. 当触发 input 事件时，更改绑定的数据值
+         * 3. 更改数据后，同步 input 的 value 值
+        **/
+        Vue.directive('mymodel', {
+            bind(el, binding, VNode) {
+                const { value } = binding;
+                el.value = value;
+
+                el.oninput = function () {
+                    VNode.context.value = el.value;
+                }
+            },
+            update(el, binding) {
+                const { value } = binding;
+                el.value = value;
+            }
+        });
+
+        // 模拟 v-show 指令
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                value: 'value'
+            }
+        });
+    </script> -->
+
+
+    <!-- <div id="app">
+        <input 
+         type="text"
+         v-show="isShow"
+        />
+    </div>
+
+    <script>
+        /**
+         * v-show：需要绑定一个参数，值为 boolean
+         * 如果是 true，display 值 为 block；
+         * 如果是 false，display 值 为 none
+        **/
+        Vue.directive('show', {
+            bind(el, binding) {
+                const { value } = binding;
+                const display = value ? '' : 'none';
+                el.style.display = display;
+            },
+            update(el, binding) {
+                const { value } = binding;
+                const display = value ? '' : 'none';
+                el.style.display = display;
+            }
+        });
+
+        // 模拟 v-show 指令
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                isShow: true
+            }
+        });
+    </script> -->
+
+
+
+    <!-- <div id="app">
+        <input 
+         type="text"
+         v-focus
+         :value="value"
+        />
+    </div>
+    
+    <script>
+        // 当进入页面时，自动聚焦 input 框
+        Vue.directive('focus', {
+            bind(el, binging, VNode) {
+                console.log(el, binging, VNode.context);
+                console.log('bind');
+            },
+            inserted(el) {
+                el.focus();
+                console.log('inserted')
+            },
+            update() {
+                console.log('update');
+            },
+            componentUpdated() {
+                console.log('componentUpdated');
+            },
+            unbind() {
+                console.log('unbind');
+            }
+        });
+
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                value: 'value'
+            }
+        });
+    </script> -->
 </body>
 
 </html>
