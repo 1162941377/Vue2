@@ -955,3 +955,7 @@ components: {
 4）oldVNode：上一个 虚拟 dom 节点，仅在 updated 和 componentUp 钩子函数中可用
 
 *如果钩子函数只有 bind 和 update， 那么可以进行简写，直接写成一个处理函数，里面是处理逻辑*
+
+## 对象字面量
+
+> 如果自定义指令需要传递多个值，可以传入一个 js 对象字面量，指令函数能接收所有合法的 js 表达式；可以通过 binding.value 获取传入的 对象字面量

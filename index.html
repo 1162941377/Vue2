@@ -11,6 +11,30 @@
 <body>
 
     <div id="app">
+        <input 
+         type="text"
+         v-demo="{
+             color: '#008c8c',
+             text: 'textContent'
+         }"
+        />
+    </div>
+
+    <script>
+        Vue.directive('demo', {
+            bind(el, binding) {
+                console.log(el, binding.value);
+            }
+        });
+
+        const vm = new Vue({
+            el: '#app'
+        });
+    </script>
+
+
+
+    <!-- <div id="app">
         <input type="text" v-slice:[slicenum].number="content" />
     </div>
 
@@ -53,7 +77,7 @@
                 slicenum: 5
             }   
         });
-    </script>
+    </script> -->
 
 
     <!-- <div id="app">
