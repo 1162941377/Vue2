@@ -985,3 +985,9 @@ components: {
 ### 过滤器串联
 
 比如说：{{ msg | filterA | filterB }}，此时，过滤器A 的参数为 msg，过滤器B 的参数为 filterA 的返回结果
+
+## 脚手架的创建和使用
+
+1）通过命令：先安装 npm install -g @vue/cli-init；再使用指令：vue init webpack 项目文件夹名
+
+2）通过 vue 提供的图形化界面，使用指令：vue ui，不推荐使用
