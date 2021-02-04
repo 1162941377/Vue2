@@ -991,3 +991,107 @@ components: {
 1）通过命令：先安装 npm install -g @vue/cli-init；再使用指令：vue init webpack 项目文件夹名
 
 2）通过 vue 提供的图形化界面，使用指令：vue ui，不推荐使用
+
+## 渲染函数
+
+> 为了更高效的书写规范，vue 提供了 render 选项，我们设置，实现想要的效果
+
+*优先级：render > template > el；注意：在 .vue 文件中的 <template></template> 标签中书写的内容优先级比 render 高*
+
+> render('', {}, []) 分别代表的是：
+
+1）第一个参数，是必选，要渲染的 标签名 或 组件名
+
+2）第二个参数，是可选，配置选项，与模板中属性对应的数据对象
+
+3）第三个参数，是可选，可以是另一个 createElement() 函数，也可以是 普通文本，都是子级虚拟节点
+
+### 深入数据对象
+
+```js
+{
+    class: {
+        foo: true,
+        baz: false
+    },
+    style: {
+        fontSize: '14px',
+        backgroundColor: 'red',
+    },
+    attrs: { // 普通的 html attribute 特性
+        id: 'name'
+    },
+    props: { // 组件名
+        myProp: 'bar'
+    },
+    domProps: { // dom 属性
+        innerHTML: 'baz'
+    },
+    on: { // 事件监听器
+        click: this.click
+        // 注意：如果其中有处理的函数，比如监听 input 框的输入事件，input(e) {console.log(this)}，值为 null，vue 做了特殊处理
+    },
+    nativeOn: { // 仅用于组件，监听原生事件，而不是组价内使用 $emit() 触发的事件
+        click: this.nativeClickHandler
+    },
+    directives: [ // 自定义指令，注意：无法对 binding 中的 oldValue 赋值，因为 vue 已经自动同步
+        {
+            name: 'my-custom-directive',
+            value: 2,
+            expression: '1 + 1',
+            arg: 'foo',
+            modifier: {
+                bar: true
+            }
+        }
+    ],
+    // 其他特殊顶层属性
+    key: 'mykey', // v-for 中必要的 key 值
+    ref: 'myRef', 
+    // 如果想要在渲染函数中给多个元素都应用了相同的 ref 名，那么 $ref.myRef 会变成一个数组
+    refInfor: true,
+    // 如果该组件是其它组件的子组件，需要为插槽指定名称
+    slot: 'name-of-slot',
+    // 作用域插槽，格式为：{ name: props => VNode | Array<VNode> }
+    scopedSlots: {
+        default: props => createElement('span', props.text);
+    }
+}
+```
+
+## 使用 JavaScript 代替模板功能
+
+> 只要在原生的 js 中可以轻松完成地操作，vue 的渲染函数就不会提供专有的替代方法，比如：v-if 和 v-for
+
+### 事件 & 按键修饰符
+
+```js
+.passive: &,
+.capture: !,
+.once: ~,
+.capture.once 或 .once.capture: ~!
+```
+
+```js
+on: {
+    '!click': this.doThisInCapturingMode,
+    '~keyup': this.doThisOnce,
+    '~!mouseover': this.doThisOnceInCapturingMode
+}
+```
+
+>对于所有的其它修饰符，私有前缀都不是必须的，我们可以在事件处理函数中使用事件方法
+
+```js
+.stop: event.stopPropagation(),
+.prevet: event.preventDefault(),
+.self: if (event.target !== event.currentTarget ) return,
+按键：.enter, .13：if (event.keyCode !== 13 ) return, 对于别的其它按键，可以将 13 改为 另一个按键码
+修饰符：.ctrl、.alt、.shift、.meta：if (!event.ctrlKey) return, 将 ctrlKey 改为 altkey、shiftKey、metaKey
+```
+
+### 插槽
+
+> 可以通过 this.$slots 访问静态插槽的内容，每个插槽都是一个 VNode 数组
+
+> 也可以通过 this.$scopedSlots 访问作用域插槽，每个作用域插槽都是一个返回若干个 VNode 的函数
