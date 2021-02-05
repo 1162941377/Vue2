@@ -1095,3 +1095,133 @@ on: {
 > 可以通过 this.$slots 访问静态插槽的内容，每个插槽都是一个 VNode 数组
 
 > 也可以通过 this.$scopedSlots 访问作用域插槽，每个作用域插槽都是一个返回若干个 VNode 的函数
+
+## JSX
+
+*如果是 js 表达式，那么使用 { } 包裹；如果是 html 的标签，使用 ( ) 包裹*
+
+*如果使用的数据来自内部，通过 this.xxx 的方式调用*
+
+> 在 vue 中使用 JSX 语法，可以让我们回到更接近模板的语法上
+
+```js
+render() {
+    return (
+        <h1>标题</h1>
+    )
+}
+```
+
+### 插槽
+
+> <div>{ this.value }</div>
+
+### 指令
+
+1）v-text：在行间使用 domPropsTextContent="内容"
+
+2）v-html：在行间使用 domPropsInnnerHTML="内容"
+
+3）v-show：jsx 支持 v-show 指令
+
+4）v-if：如果是简单的逻辑判断，使用三元表达式即可；如果是较复杂的逻辑判断，可以使用 methods 中的自定义方法
+
+5）v-for：结合使用 map 方法
+
+```js
+{ [1, 2, 3, 4, 5].map(item => (<div key={ item }>{ item }</div>)) }
+```
+
+6）v-on：有如下两种情况
+
+```js
+<button onClick={ this.handleClick }>点击事件</button>
+<button on-click={ this.handleClick }>点击事件</button>
+
+// 对应 @click.native
+<cmp-button nativeOnClick={ this.handleClick }>原生点击事件</cmp-button>
+
+// 如果要传递参数
+<button onClick={ e => this.handleClick('参数') }>触发点击事件，传递参数</button>
+```
+
+7）v-bind：<input type="text" value={ this.value } />
+
+*在 JSX 中可以直接使用 class="xx" 来指定类，内联样式可以直接写成 style="xxx" 的形式*
+
+```js
+<div class="a b" style="font-size: 12px">Content</div>
+<div class="[a, b]">Content</div>
+<div class={ {a: true, b:false} }>Content</div>
+<div style={ {color: 'red', fontSize: '14px'} }>Content</div>
+```
+
+8）v-model：可以直接使用
+
+9）v-slot：如下
+
+```html
+<my-cmp>
+    默认插槽
+    <div slot="default">默认插槽</div>
+    <div slot="header">具名插槽</div>
+</my-cmp>
+```
+
+10）v-pre、v-cloak、once，这三个指令不常用，没有替代方案
+
+11）ref，当遍历元素或组件时，如：
+
+```js
+[1, 2, 3, 4, 5].map(item => (<div ref={ item }>{ item }</div>))
+
+// 如果想得到一个数组，需要添加 refInFor={ true }
+[1, 2, 3, 4, 5].map(item => (<div  refInFor={ true } ref={ item }>{ item }</div>))
+```
+
+### 自定义指令
+
+```js
+render() {
+    return (
+        // 第一种方式
+        <input type="text" v-slice={
+            {
+                value: this.value,
+                modifier: {
+                    number: true
+                }
+            }
+        } />
+    )
+    
+    // 第二种方式
+    const directives = [
+        {
+            name: 'slice',
+            value: this.value,
+            modifier: {
+                number: true
+            }
+        }
+    ];
+
+    return (
+        <div { ... { directives } }></div>
+    )
+}
+```
+
+### 过滤器
+
+```js
+// 正常使用
+<div>
+    {{ msg | capitalize }}
+</div>
+
+// 在 JSX 中使用
+<div>
+    { this.$options.filter('capitalize')(this.msg) }
+</div>
+```
