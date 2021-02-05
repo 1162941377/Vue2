@@ -1225,3 +1225,40 @@ render() {
     { this.$options.filter('capitalize')(this.msg) }
 </div>
 ```
+
+## 函数式组件
+
+> 当一个组件不需要状态（即响应式数据）、不需要任何生命周期函数，只接收一些 props 来显示组件时，我们可以将其标记为函数式组件
+
+```js
+functional: true
+```
+
+*函数式组件只是函数，渲染开销会降低很多*
+
+> 在 2.3 版本之前，如果想要传递数据，props 选项是必须的；2.3 版本之后，可以省略 props 选项，组件上的 attribute 都会自动隐式解析为 prop
+
+为了弥补缺少的实例，render() 可以接收第二个参数，context 作为上下文
+
+```yaml
+props: 提供所有 prop 对象
+slots: 是一个函数，返回的结果是所有插槽（作用域）的对象
+scopedSlots: 一个暴露传入的作用域插槽的对象，也以为函数形式暴露普通插槽
+data: 传递给组件的整个数据对象，作为 createElement 的第二个参数传入组件
+parent: 对父组件的引用
+listeners: 一个包含所有父组件为当前组件注册的事件监听对象，这是一个 data.on 的别名
+injections: 如果使用了 inject 选项，则该对象包含了应当被注入的属性
+children: VNode 子节点的数组，包含了所有的非作用域插槽和具名插槽
+```
+
+> slots() vs children：
+
+1）如果设置了具名插槽，没有显式设置默认插槽，那么 slots 获取的是：具名插槽和那些默认插槽；children 获取的是：默认插槽
+
+2）如果设置了具名插槽，同样也设置了默认插槽，那么 slots 获取的是：具名插槽和默认插槽；children 获取的是：没有显式设置default 的默认插槽
+
+> 在 2.5.0 及以上版本，如果使用的是单文件组件，那么基于模板的函数式组件可以这样申明：
+
+```html
+<template functional></template>
+```
