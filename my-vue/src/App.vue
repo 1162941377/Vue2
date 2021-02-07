@@ -1,82 +1,42 @@
 <template>
-<base-model></base-model>
+  <div id="app">
+    <button @click="show = true">click</button>
+    <async-cmp-1 v-if="show"></async-cmp-1>
+    <async-cmp-2 v-if="show"></async-cmp-2>
+  </div>
 </template>
 
 <script>
 // <template>
-// <div id="app">
-//   <base-level :level="1">标题</base-level>
-//   <base-level :level="2">标题</base-level>
-//   <base-level :level="3">标题</base-level>
-//   <base-level :level="4">标题</base-level>
-//   <base-level :level="5">标题</base-level>
-//   <base-level :level="6">标题</base-level>
-// </div>
-// </template>
-// <template>
-//   <div id="app" class="app">
-//     <img alt="Vue logo" src="./assets/logo.png">
-//     <HelloWorld msg="Welcome to Your Vue.js App"/>
+//   <div id="app">
+//     <button @click="show = !show">click</button>
+//     <!-- <transition-single>
+//       <div v-if="show">hello world</div>
+//     </transition-single>
+
+//     <transition-single>
+//       <div v-if="show">hello zou</div>
+//     </transition-single> -->
+
+//     <transition-single>
+//       <div v-if="show" key="world">hello world</div>
+//       <div v-else key="zou">hello zou</div>
+//     </transition-single>
 //   </div>
 // </template>
-// import HelloWorld from './components/HelloWorld.vue'
-
-import baseIfFor from './components/baseIfFor'
-import baseLevel from './components/base-level'
-import baseOn from './components/base-on'
-import baseModel from './components/baseModel'
+// import TransitionSingle from "./components/TransitionSingle";
 
 export default {
-  name: 'App',
+  name: "app",
   components: {
-    // HelloWorld
-    baseLevel,
-    baseOn,
-    baseIfFor,
-    baseModel
+    // TransitionSingle,
+    AsyncCmp1: () => import(/* webpackChunkName: 'async' */ './components/Async1'),
+    AsyncCmp2: () => import(/* webpackChunkName: 'async' */ './components/Async2')
   },
-  render(createElement) {
-    return createElement('a', {
-      class: {
-        isShow: false,
-        isSelected: true
-      },
-      style: {
-        color: 'red',
-        fontSize: '14px',
-        backgroundColor: '#008c8c'
-      },
-      attrs: {
-        id: 'name'
-      },
-      domProps: {
-        innerHTML: '<span>hehe</span>'
-      },
-      on: {
-        click() {
-          console.log('hehe');
-        }
-      },
-      nativeOn: {
-        click() {
-          console.log('hehe');
-        }
-      }
-    }, [
-      createElement('div', 'text'),
-      'textContent'
-    ]);
-  }
-}
+  data() {
+    return {
+      show: false,
+    };
+  },
+};
 </script>
-
-<style>
-/* #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-} */
-</style>

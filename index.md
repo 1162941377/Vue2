@@ -1262,3 +1262,182 @@ children: VNode 子节点的数组，包含了所有的非作用域插槽和具�
 ```html
 <template functional></template>
 ```
+
+## 过渡
+
+> vue 在插入、更新或删除 dom 时，提供了多种不同方式的应用过渡效果
+
+### 单元素 / 组件的过渡
+
+> Vue 提供了 transition 的封装组件，在下列情况下，可以给任何元素和组件添加进入 / 离开过渡
+
+1）条件渲染（v-if）
+
+2）条件展示（v-show）
+
+3）动态组件（<component :is="组件名" />）
+
+4）组件根节点
+
+### 过渡类名
+
+1）v-enter：当元素被插入之前的状态，在动画的下一帧随即被移除
+
+2）v-enter-active：当元素在过渡过程中的状态，这里可以运用 css3 的语法
+
+3）v-enter-to：当元素过渡效果结束，被移除之前的状态（与此同时，v-enter被移除）
+
+4）v-leave：当元素被移除之前的状态，在动画的下一帧随即被移除
+
+5）v-leave-active：当元素在过渡过程中的状态，这里可以运用 css3 的语法
+
+6）v-leave-to：当元素过渡效果结束，被移除之前的状态（与此同时，v-leave被移除）
+
+### 类名前缀
+
+1）如果 transition 没有设置 name 特性，那么类名的前缀为 v-
+
+2）如果 transition 设置了 name 特性，那么类名的前缀为 (name 的值)-
+
+### css 动画
+
+> css 动画用法与 css 过渡，区别在于：在动画中，v-enter 类名在节点插入到 dom 后不会立即删除，而是在 animationed 事件触发后删除
+
+### 自定义类名
+
+> 使用：enter-class、enter-active-class、enter-to-class；leave-class、leave-active-class、leave-to-class
+
+*优先级高于普通的类型，可以结合使用其他第三方库（Animate.css），通过命令行：npm install animate.css*
+
+### 同时使用过渡和动画
+
+> 在使用过渡动画的时候，可以会出现一种情况：父元素过渡结束，可是子元素还在过渡，想立即结束动画。我们可以使用 type 属性，告诉 vue 根据哪个结束事件为主。type 的值有两种：animation 和 transition。
+
+*默认情况下，vue 会选择时间长的过渡，来判断是否可以结束过渡*
+
+### 显式的过渡时间
+
+> vue 会自动得出过渡效果的完成时机，从而对 dom 进行处理
+
+> 但有些时候，我们不想这样，比如元素间的嵌套关系，可以显式地定义 :duration 属性，值就是我们想要过渡的时长，也可以是一个对象，定义 enter 和 leave 两个时间段
+
+### 初始渲染的过渡
+
+> 如果我们想对元素的初始状态，做更改，使用 appear 特性，和 进入 / 离开 过渡效果一样，同样可以自定义 css 类名
+
+> 使用：appear-class、appear-active-class、appear-to-class
+
+> 一般用于进入页面时要显示的动画效果
+
+### JavaScript 钩子函数
+
+*注意：如果钩子函数中只接收了 el 这个参数，而没有设置第二个参数 done，那么 浏览器会一直等待，而不是执行 @after-enter 钩子函数*
+
+```js
+done();
+```
+
+*如果要取消动画，执行下条语句，还是会执行一遍 @after-enter 钩子函数*
+
+```js
+done.cancelled = true;
+```
+
+1）@before-enter：动画入场前，可以在其中设置元素在动画开始前的起始样式
+
+2）@enter：动画入场后，可以在其设置动画
+
+3）@after-enter：动画完成后
+
+4）@enter-cancelled：取消动画
+
+5）@before-leave：同上
+
+6）@leave：同上
+
+7）after-leave：同上
+
+8）leave-cancelled：同上
+
+9）@before-appear：同上
+
+10）@appear：同上
+
+11）@after-appear：同上
+
+12）@appear-cancelled：同上
+
+*可以配合使用第三方库（Velocity.js），通过命令行：npm install velocity-animate*
+
+> 可以实现简写，如果是 tranform 的属性值
+
+> 对于仅使用 js 过渡的元素，我们可以在 transition 标签上设置 :css="false"，vue 会跳过 css 的检测，类似于 v-pre 的功能
+
+### 多元素过渡
+
+> 当切换展示的元素标签名同名时，需要给每一个元素设置不同的 key 值，否则 vue 为了效率，只会替换相同标签内的内容（就近原则）
+
+### 过渡模式
+
+> vue 提供了一个全新的 mode 特性，可以给多个元素过渡应用不同的模式，mode 的值为：
+
+*in-out：新元素会先进行过渡，完成之后当前元素过渡离开；out-in：当前元素先进行过渡，完成之后新元素过渡进入*
+
+### 多组件过渡
+
+> 我们可以使用动态组件切换展示不同的组件
+
+```html
+<component :is="组件名" />
+```
+
+### 列表过渡
+
+> 当想要给一个列表添加过渡效果时，我们可以使用 <transition-group></transition-group> 组件
+
+> 不同的是：
+
+1）该组价会生成一个默认的 span 标签，我们也可以通过 tag 属性改变为其它元素
+
+2）过渡模式不可用，因为我们不再切换特有的元素
+
+3）内部元素总是需要提供一个唯一的 key 属性值
+
+4）css 过渡的类将会应用在内部的元素中，而不是这个组 / 容器本身
+
+### 列表的排序过渡
+
+> 提供了一个全新的特性，v-move，它会在元素改变定位的过程中应用。通过 v-move={}，当设置了 name 属性时，需要改为 name-move
+
+*内部实现：vue 使用了 FLIP 动画队列，使用 transform 属性将元素从之前的位置平滑过渡到新的位置上*
+
+> 注意的是：FLIP 过渡的元素的 display 值不能为 inline，作为代替方案，可以设置为 display: inline-block 或 放置于 flex 中
+
+### 列表的交错过渡
+
+> 如果想要给列表中的元素，应用更丰富的过渡效果，可以配合使用 JavaScript 钩子函数
+
+### 复用过渡
+
+> 过渡可以通过 vue 的组件系统实现复用，要创建一个可复用组件，我们需要做的是：将 或者 作为根组件，然后将任何子组件放置到其中就可以了
+
+*注意：当使用函数式组件复用过渡时，不能设置 css 的 scoped 作用域*
+
+## 异步组件
+
+```js
+compoents: {
+    AsyncCmp: () => import ('url')
+}
+```
+
+> 也可以将多个需要加载的组件合并到一个组件中，同时获取
+
+```js
+components: {
+    AsyncCmp1: () => import (/* webpackChunkName: 'async' */ 'url')
+    AsyncCmp2: () => import (/* webpackChunkName: 'async' */ 'url')
+}
+```
+
+> 异步加载的组件，会在 link 标签上设置 el="prefetch"，浏览器会在空闲时间下载，使用时从缓存中获取，以提高性能；与之对应到的是：preLoad，会及时下载对应的资源
