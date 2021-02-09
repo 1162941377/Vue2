@@ -1,42 +1,58 @@
 <template>
   <div id="app">
-    <button @click="show = true">click</button>
-    <async-cmp-1 v-if="show"></async-cmp-1>
-    <async-cmp-2 v-if="show"></async-cmp-2>
+    <div class="nav-box">
+      <div class="logo">渡一教育</div>
+      <div class="nav-list">
+        <router-link to="/">首页</router-link>
+        <router-link to="/learn">课程学习</router-link>
+        <router-link to="/student">学员展示</router-link>
+        <router-link to="/about">关于</router-link>
+        <router-link to="/activtiy">社区</router-link>
+      </div>
+    </div>
+
+    <div class="container">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
-// <template>
-//   <div id="app">
-//     <button @click="show = !show">click</button>
-//     <!-- <transition-single>
-//       <div v-if="show">hello world</div>
-//     </transition-single>
-
-//     <transition-single>
-//       <div v-if="show">hello zou</div>
-//     </transition-single> -->
-
-//     <transition-single>
-//       <div v-if="show" key="world">hello world</div>
-//       <div v-else key="zou">hello zou</div>
-//     </transition-single>
-//   </div>
-// </template>
-// import TransitionSingle from "./components/TransitionSingle";
-
 export default {
   name: "app",
-  components: {
-    // TransitionSingle,
-    AsyncCmp1: () => import(/* webpackChunkName: 'async' */ './components/Async1'),
-    AsyncCmp2: () => import(/* webpackChunkName: 'async' */ './components/Async2')
-  },
-  data() {
-    return {
-      show: false,
-    };
-  },
 };
 </script>
+
+<style>
+body {
+  margin: 0;
+}
+
+.nav-box {
+  display: flex;
+  justify-content: space-between;
+  height: 60px;
+  line-height: 60px;
+  background-color: #3385ff;
+}
+
+.nav-list a {
+  margin-left: 40px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-list a.router-link-exact-active {
+  font-weight: bold;
+}
+
+.container {
+  margin-top: 60px;
+}
+
+.nav-box,
+.container {
+  padding-left: 200px;
+  padding-right: 200px;
+}
+</style>

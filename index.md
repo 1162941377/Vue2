@@ -1441,3 +1441,243 @@ components: {
 ```
 
 > 异步加载的组件，会在 link 标签上设置 el="prefetch"，浏览器会在空闲时间下载，使用时从缓存中获取，以提高性能；与之对应到的是：preLoad，会及时下载对应的资源
+
+## VueRouter
+
+> 路由是根据不同的 url 地址展现不同的内容或页面。早期的路由都是后端直接根据 url 来重载页面实现的，即后端控制路由。后来页面越来越复杂，服务器压力越来越大，随着 ajax（异步刷新技术）的出现，页面的实现非重载就能刷新数据，让前端也可以控制 url 自行管理，前端路由此诞生
+
+### 应用场景
+
+> 前端路由更多应用在单页上，也就是 SPA（Single Page Web Application），在单页应用中，大部分页面结果不变，只改变部分内容的使用
+
+### 安装及应用
+
+1）通过命令 npm install vue-router
+
+2）引入路由，通过 import
+
+3）使用路由，通过 Vue.use(VueRouter)
+
+4）定义路由组件
+
+5）创建 router 实例，然后传 routes 配置
+
+6）创建和挂载根实例
+
+### html
+
+> 使用 router-link 组件来实现导航，使用 to 属性指定连接，使用 router-view 路由出口组件
+
+<router-link></router-link> 会默认渲染为一个 a 标签
+
+### router-link class
+
+1）router-link-exact-active：当前展示的路径完全匹配组件 to 的值
+
+2）router-link-active：当前展示的路径包含 to 的值
+
+```js 更改 class 名
+VueRouter({
+    linkExactActiveClass: 'link-exact-active',
+    linkActiveClass: 'link-active'
+})
+```
+
+### hash 模式
+
+> vue-router 默认 hash 模式 ------ 使用 url 的 hash 来 模拟一个完整的 url，于是当 url 改变时，页面不会重新加载
+
+### history
+
+> 我们可以使用路由的 history 模式，这种模式利用的是 html5 提供的 history.pushState API 来完成 url 跳转而无须重新加载页面
+
+```js
+VueRouter({
+    mode: 'history'
+})
+```
+
+*弊端：需要和后端配合，因为是单页面应用，如果后端没有正确配置，当用户在浏览器中直接访问就会返回 404，影响用户体验*
+
+> 解决办法：要在服务端增加一个覆盖所有情况的候选资源：如果 url 匹配不到任何静态资源，则应该返回同一个 index.html 页面，这个页面就是我们 app 依赖的页面
+
+### 命名路由
+
+> 可以通过一个名称标识一个路由，这样在某些时候会更方便些，特别是在链接一个路由，或者是执行一些跳转时，可以创建 Router 实例，在 routes 配置中给某个路由设置名称
+
+```js
+routes = [
+    {
+        path: '/activity/personal',
+        name: 'personal',
+        component: Personal
+    }
+]
+```
+
+> 要链接到一个命名路由，可以给 router-link 的 to 属性传一个对象：<router-link :to="{ name: 'personal' }">个人中心</router-link>
+
+### 嵌套路由
+
+> 一个被 router-view 渲染的组件想要包含自己的嵌套的 router-view 时，可以使用嵌套路由，通过配置 children
+
+> 子路由的路径可以简写，直接书写名称
+
+> 当访问 /activity 下的其它路径时，并不会渲染出来任何东西，如果想要渲染，可以提供一个空的路由
+
+### 重定向
+
+> 通过配置 redirect
+
+1）可以是一个组件
+
+2）可以是一个命名路由
+
+3）可以是一个方法，实现动态返回重定向的目标
+
+### 别名
+
+> 通过配置 alias
+
+### 编程式导航
+
+> 通过在 vue 根实例上的 router 配置传入 router 实例，$router、$route 两个属性会被注入到每个组件中
+
+1）$router：路由实例对象，提供了三个方法
+
+    1）$router.push()：添加一条记录，当用户点击浏览器的回退按钮时，会返回到之前的 url
+
+        > 可以是：字符串、对象、命名路由
+
+    2）$router.replace()：替换当前记录
+
+    3）$router.go(n)：类似于 window.history.go(n)，如果是 0，刷新当前页面；如果是 +数，相当于是 history.forward()；如果是 -数，相当于是 history.back()；如果 history 记录不够，不处理任何操作
+
+2）$route：只读，路由信息对象，有如下参数
+
+```js
+{
+    path: 字符串，对应当前路由的路径，总是解析为绝对路径
+    parmas: 一个 key / value 对象，包含了动态片段和全匹配片段，如果没有路由参数，就是一个空对象
+    query: 一个 key / value 对象，表示 url 查询参数
+    hash: 路由的 hash 值，如果没有，则为空字符串
+    fullPath: 完成解析后的 url，包含查询参数和 hash 的完整路径
+    matched: 一个数组，包含当前路由的所有嵌套路径片段的路由记录
+    name: 当前路由的名称，如果有的话
+    redirectFrom: 如果存在重定向，即为重定向来源的路由的名字
+}
+```
+
+### 动态路由匹配
+
+> 当我们只需要把某种模式匹配到的所有路由，全部映射到同个组件时，我们可以使用 :id（动态路径参数）来达到这个效果
+
+*一个“路径参数”使用冒号 : 标记。当匹配到一个路由时，参数值会被设置到 this.$route.params 中，可以在每个组件中使用*
+
+### 命名视图 - 路由组件传参
+
+> 配置 name 属性，如果没有设置，默认为 default
+
+> 为了减少 this.$route 的依赖，我们可以在路由配置 props，可以是一个对象，也可以是 布尔值为 true，然后在需要使用的组件内配置 props 对象，接收传递的参数，绑定到当前组件的 this 身上
+
+*如果传递的是一个对象，那么需要一个参数 route，直接使用其的属性*
+
+### 导航守卫
+
+> 主要通过跳转和取消的方式来守卫导航
+
+1）全局守卫：路由实例上直接操作的钩子函数，触发路由就会触发这些钩子函数
+
+- beforeEach（全局前置守卫）：在路由跳转前触发，一般用于登陆验证
+
+- beforeResolve（全局解析守卫）：和 beforeEach 类似，路由跳转前触发
+
+    > 区别在于：在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，解析守卫就被调用
+
+- afterEach（全局后置守卫）：和 beforeEach 相反，路由跳转后触发
+
+2）路由守卫：是指单个路由配置的时候也可以设置的钩子函数
+
+- beforeEnter：和 beforeEach 完全相同，如果都设置了，那么先执行的是 beforeEach
+
+3）组件守卫：是指组件内执行的钩子函数，类似于组件内的生命周期，相当于为配置路由的组件添加的生命周期钩子函数
+
+- beforeRouteEnter：路由进入之前调用，不能访问到 this 的实例，但是可以通过 next 参数提供的回调函数，这个函数时在 mounted 之后执行的，可以访问到 this 实例
+
+- beforeRouteUpdate：当前路由改变时，并且该组件被复用时，被调用，可以通过 this 访问实例
+
+    > 动态路由间互相跳转、路由 query 变更
+
+-beforeRouteLeave：导航离开该组件的对应路由时被调用，可以访问到组件实例 this
+
+> 以上的钩子函数，都可以接收三个参数：
+
+1）to：目标路由对象
+
+2）from：即将要离开的路由对象
+
+3）next：三个参数中最最最重要的参数，如果要实现跳转，一旦设置了这个钩子函数，必须要执行 next() 方法；如果我们不想要跳转发生，可以使用 next(false) 方法；如果传入的参数是一个 Error 实例，则导航会被终止，且该错误会被传递给 route.onError() 注册过的回调，我们可以通过这个函数获取对应的错误信息；可以传递参数，值和 $route.push() 一致
+
+*完整的路由解析流程（ 12步 ）*
+
+1）导航被触发
+
+2）调用失活组件的 beforeRouteLeave
+
+3）调用全局的 beforeEach
+
+4）在重用组件内调用 beforeRouteUpdate
+
+5）调用路由的 beforeEnter
+
+6）解析异步组件
+
+7）在激活的组件内调用 beforeRouteEnter
+
+8）调用全局的 beforeResolve
+
+9）导航被确认
+
+10）调用全局的 afterEach
+
+11）触发 DOM 更新
+
+12）依次 vue 的生命周期钩子函数，beforeCreate、created、beforeMounte、mounted后，创建实例对象，执行 beforeRouteEnter 中的 next 回调函数
+
+### 路由元信息
+
+> 定义路由的时候，可以通过配置 meta 字段，用于定义一些信息
+
+### 过渡特效
+
+> 是基本的动态组件，我们可以使用组件来给它添加一些过渡效果，通过 <transition></transition> 标签
+
+### 滚动行为
+
+> 使用前端路由，当切换到新的路由时，想要页面滚到顶部，或者是保持原来的位置，就像重新加载页面那样。vue-router 可以自定义路由切换时页面如何滚动
+
+*注意：这个功能只能支持 history.pushState 的浏览器中使用*
+
+当创建一个 Router 实例，我们可以提供一个 scrollBehavior 方法，可以接收三个参数：
+
+1）to：目标路由对象
+
+2）from：即将要离开的路由对象
+
+3）savedPosition：当且仅当 popState 导航被触发（通过浏览器的 前进 / 回退 按钮）时才可以被调用
+
+```js scrollBehavior 返回的滚动对象的信息如下
+{
+    x: number,
+    y: number
+}
+
+或
+
+{
+    selector: string, offset: {
+        x: number,
+        y: number
+    }
+}
+``` selector 值为 hash
