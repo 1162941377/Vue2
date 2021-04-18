@@ -7,10 +7,9 @@
         <router-link to="/learn">课程学习</router-link>
         <router-link to="/student">学员展示</router-link>
         <router-link to="/about">关于</router-link>
-        <router-link to="/activtiy">社区</router-link>
+        <router-link to="/activity">社区</router-link>
       </div>
     </div>
-
     <div class="container">
       <router-view></router-view>
     </div>
@@ -20,13 +19,12 @@
 <script>
 export default {
   name: "app",
+  components: {},
 };
 </script>
 
-<style>
-body {
-  margin: 0;
-}
+<style scoped>
+@import url("./assets/reset.css");
 
 .nav-box {
   display: flex;
@@ -34,6 +32,10 @@ body {
   height: 60px;
   line-height: 60px;
   background-color: #3385ff;
+}
+
+.nav-box .logo {
+  color: #fff;
 }
 
 .nav-list a {

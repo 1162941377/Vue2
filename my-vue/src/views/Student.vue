@@ -1,3 +1,5 @@
 <template>
-  <div class="student">学员展示</div>
+  <div class="student">
+    学员展示
+  </div>
 </template>

@@ -1242,8 +1242,8 @@ functional: true
 
 ```yaml
 props: 提供所有 prop 对象
-slots: 是一个函数，返回的结果是所有插槽（作用域）的对象
-scopedSlots: 一个暴露传入的作用域插槽的对象，也以为函数形式暴露普通插槽
+slots: 是一个函数，返回的结果是所有插槽（非作用域）的对象
+scopedSlots: 一个暴露传入的作用域插槽的对象，也以函数形式暴露普通插槽
 data: 传递给组件的整个数据对象，作为 createElement 的第二个参数传入组件
 parent: 对父组件的引用
 listeners: 一个包含所有父组件为当前组件注册的事件监听对象，这是一个 data.on 的别名
